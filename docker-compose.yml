@@ -77,6 +77,9 @@ secrets:
     file: ./open_ai_key.txt
   huggingface_key:
     file: ./hf_key.txt
+volumes:
+  open-webui:
+
 
 networks:
   default:
