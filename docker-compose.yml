@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  # vLLM - LLM inference service with the smallest model
+  vllm:
+    image: vllm/vllm-openai:latest
+    container_name: vllm
+    runtime: nvidia
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [ gpu ]
+    ports:
+      - "8000:8000"
+    environment:
+      - MODEL_NAME=TheBloke/TinyLlama-1.1B-Chat-v1.0-GGUF # Smallest model (1.1B)
+      - TENSOR_PARALLEL_SIZE=1
+      # - HUGGING_FACE_HUB_TOKEN=<secret>
+    volumes:
+      - ./models:/models # Mount your model directory (if needed)
+      - ~/.cache/huggingface:/root/.cache/huggingface
+    ipc: host
+    secrets:
+      - huggingface_key
+
+  # LlamaIndex - For RAG handling
+  llamaindex:
+    image: python:3.9-slim
+    container_name: llamaindex
+    command: >
+      bash -c "pip install llama-index llama-index-vector-stores-chroma openai && export OPENAI_API_KEY=$(cat /run/secrets/openai_api_key) && python3 -m llama_index.run"
+    volumes:
+      - ./docs:/app/docs
+    secrets:
+      - openai_api_key
+
+  # Open WebUI - Chat interface
+  # open-webui:
+  #   image: openwebui/openwebui:latest # Replace with a valid image name
+  #   container_name: open-webui
+  #   ports:
+  #     - "3000:3000"
+  #   environment:
+  #     - API_URL=http://vllm:8000/v1
+
+  # FlowiseAI - No-code RAG workflow manager
+  flowise:
+    image: flowiseai/flowise:latest
+    container_name: flowise
+    ports:
+      - "3001:3000"
+    environment:
+      - DATABASE_URL=sqlite:///flowise.db
+    volumes:
+      - ./flowise_data:/app/data
+
+secrets:
+  openai_api_key:
+    file: ./open_ai_key.txt
+  huggingface_key:
+    file: ./hf_key.txt
+
+networks:
+  default:
+    name: llm-rag-network
