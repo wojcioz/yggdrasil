@@ -1,3 +1,20 @@
-github_key.txt
-hf_key.txt
+# Ignore Git and VSCode files
+.git
+.vscode
+
+# Ignore environment files
+*.env
+*.venv
+
+# Ignore secrets
 open_ai_key.txt
+hf_key.txt
+github_key.txt
+
+# Ignore Python caches
+__pycache__
+*.pyc
+
+# Ignore local data folders
+models
+flowise_data
