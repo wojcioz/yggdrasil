@@ -36,13 +36,15 @@ services:
       - openai_api_key
 
   # Open WebUI - Chat interface
-  # open-webui:
-  #   image: openwebui/openwebui:latest # Replace with a valid image name
-  #   container_name: open-webui
-  #   ports:
-  #     - "3000:3000"
-  #   environment:
-  #     - API_URL=http://vllm:8000/v1
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: open-webui
+    ports:
+      - "3000:8080"
+    volumes:
+      - open-webui:/app/backend/data
+    environment:
+      - API_URL=http://vllm:8000/v1
 
   # LangGraph - AI Workflow Orchestrator
   langgraph:
