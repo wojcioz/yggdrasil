@@ -44,6 +44,21 @@ services:
   #   environment:
   #     - API_URL=http://vllm:8000/v1
 
+  # LangGraph - AI Workflow Orchestrator
+  langgraph:
+    image: python:3.9-slim
+    container_name: langgraph
+    command: >
+      bash -c "pip install langgraph langchain openai requests && python3 /app/langgraph_server.py"
+    volumes:
+      - ./langgraph:/app # Mount local directory for code
+    ports:
+      - "5000:5000" # Expose LangGraph API
+    environment:
+      - OPENAI_API_KEY=$(cat /run/secrets/openai_api_key) # If using OpenAI embeddings
+      - VLLM_API=http://vllm:8000/v1 # Connect to vLLM
+      - LLAMAINDEX_API=http://llamaindex:5000 # Connect to LlamaIndex
+
   # FlowiseAI - No-code RAG workflow manager
   flowise:
     image: flowiseai/flowise:latest
