@@ -30,6 +30,8 @@ services:
     container_name: llamaindex
     command: >
       bash -c "pip install llama-index llama-index-vector-stores-chroma openai && export OPENAI_API_KEY=$(cat /run/secrets/openai_api_key) && python3 -m llama_index.run"
+    ports:
+      - "5001:5000"
     volumes:
       - ./docs:/app/docs
     secrets:
@@ -44,7 +46,7 @@ services:
     volumes:
       - open-webui:/app/backend/data
     environment:
-      - API_URL=http://vllm:8000/v1
+      - API_URL=http://localhost:8000/v1
 
   # LangGraph - AI Workflow Orchestrator
   langgraph:
@@ -58,8 +60,8 @@ services:
       - "5000:5000" # Expose LangGraph API
     environment:
       - OPENAI_API_KEY=$(cat /run/secrets/openai_api_key) # If using OpenAI embeddings
-      - VLLM_API=http://vllm:8000/v1 # Connect to vLLM
-      - LLAMAINDEX_API=http://llamaindex:5000 # Connect to LlamaIndex
+      - VLLM_API=http://localhost:8000/v1 # Connect to vLLM
+      - LLAMAINDEX_API=http://localhost:5001 # Connect to LlamaIndex
 
   # FlowiseAI - No-code RAG workflow manager
   flowise:
