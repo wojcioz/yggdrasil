@@ -3,7 +3,9 @@ version: '3.8'
 services:
   # vLLM - LLM inference service with the smallest model
   vllm:
-    image: vllm/vllm-openai:latest
+    build:
+      context: ./vllm
+      dockerfile: Dockerfile
     container_name: vllm
     runtime: nvidia
     deploy:
@@ -16,10 +18,10 @@ services:
     environment:
       - MODEL_NAME=TheBloke/TinyLlama-1.1B-Chat-v1.0-GGUF # Smallest model (1.1B)
       - TENSOR_PARALLEL_SIZE=1
-      # - HUGGING_FACE_HUB_TOKEN=<secret>
     volumes:
       - ./models:/models # Mount your model directory (if needed)
       - ~/.cache/huggingface:/root/.cache/huggingface
+      - ./vlll_code:/code # Mount your code directory
     ipc: host
     secrets:
       - huggingface_key
@@ -38,15 +40,15 @@ services:
       - openai_api_key
 
   # Open WebUI - Chat interface
-  open-webui:
-    image: ghcr.io/open-webui/open-webui:main
-    container_name: open-webui
-    ports:
-      - "3000:8080"
-    volumes:
-      - open-webui:/app/backend/data
-    environment:
-      - API_URL=http://localhost:8000/v1
+  # open-webui:
+  #   image: ghcr.io/open-webui/open-webui:main
+  #   container_name: open-webui
+  #   ports:
+  #     - "3000:8080"
+  #   volumes:
+  #     - open-webui:/app/backend/data
+  #   environment:
+  #     - API_URL=http://localhost:8000/v1
 
   # LangGraph - AI Workflow Orchestrator
   langgraph:
@@ -68,7 +70,7 @@ services:
     image: flowiseai/flowise:latest
     container_name: flowise
     ports:
-      - "3001:3000"
+      - "3003:3000"
     environment:
       - DATABASE_URL=sqlite:///flowise.db
     volumes:
@@ -79,10 +81,3 @@ secrets:
     file: ./open_ai_key.txt
   huggingface_key:
     file: ./hf_key.txt
-volumes:
-  open-webui:
-
-
-networks:
-  default:
-    name: llm-rag-network
