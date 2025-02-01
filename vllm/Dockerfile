@@ -11,8 +11,6 @@ COPY app/download_model_transformers.py /app/download_model_transformers.py
 RUN pip3 install transformers
 
 # Set environment variables
-ENV MODEL_NAME=TheBloke/TinyLlama-1.1B-Chat-v1.0-GGUF
-ENV TENSOR_PARALLEL_SIZE=1
 
 # Set the working directory
 WORKDIR /app
