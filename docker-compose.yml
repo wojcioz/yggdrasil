@@ -22,7 +22,6 @@ services:
       - ./models:/models # Mount your model directory (if needed)
       - ~/.cache/huggingface:/root/.cache/huggingface
       - ./vllm/app:/app # Mount your code directory
-      - ./chat_template.yaml:/app/chat_template.yaml # Mount the chat template file
     ipc: host
     secrets:
       - huggingface_key

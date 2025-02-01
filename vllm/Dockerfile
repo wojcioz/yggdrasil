@@ -5,7 +5,7 @@ FROM vllm/vllm-openai:latest
 RUN apt-get update && apt-get install -y python3 python3-pip
 
 # Copy the Python script into the container
-COPY app/download_model_transformers.py /app/download_model_transformers.py
+# COPY app/download_model_transformers.py /app/download_model_transformers.py
 
 # Install transformers library
 RUN pip3 install transformers
