@@ -15,13 +15,13 @@ services:
             - capabilities: [ gpu ]
     ports:
       - "8000:8000"
-    environment:
-      - MODEL_NAME=TheBloke/TinyLlama-1.1B-Chat-v1.0-GGUF # Smallest model (1.1B)
-      - TENSOR_PARALLEL_SIZE=1
+    # environment:
+    #   - MODEL_NAME=TheBloke/TinyLlama-1.1B-Chat-v1.0-GGUF # Smallest model (1.1B)
+    #   - TENSOR_PARALLEL_SIZE=1
     volumes:
       - ./models:/models # Mount your model directory (if needed)
       - ~/.cache/huggingface:/root/.cache/huggingface
-      - ./vllm_code:/code # Mount your code directory
+      - ./vllm/app:/app # Mount your code directory
       - ./chat_template.yaml:/app/chat_template.yaml # Mount the chat template file
     ipc: host
     secrets:

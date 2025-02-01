@@ -17,3 +17,5 @@ WORKDIR /app
 
 # Command to run your application
 # CMD ["python3", "/app/download_model_transformers.py"]
+
+ENTRYPOINT ["python3", "start_vllm.py"]
