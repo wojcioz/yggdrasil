@@ -8,7 +8,7 @@ RUN apt-get update && apt-get install -y python3 python3-pip
 # COPY app/download_model_transformers.py /app/download_model_transformers.py
 
 # Install transformers library
-RUN pip3 install transformers
+RUN pip3 install transformers bitsandbytes
 
 # Set environment variables
 
