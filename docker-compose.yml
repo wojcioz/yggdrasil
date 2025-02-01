@@ -42,7 +42,7 @@ services:
 
   # Open WebUI - Chat interface
   open-webui:
-    image: openwebui/open-webui:latest
+    image: ghcr.io/open-webui/open-webui:main
     container_name: open-webui
     ports:
       - "3000:8080"
