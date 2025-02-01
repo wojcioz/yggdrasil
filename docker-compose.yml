@@ -25,7 +25,7 @@ services:
     ipc: host
     secrets:
       - huggingface_key
-    command: '--model mistralai/Mistral-7B-v0.1 --chat-template /app/chat_template.yaml'
+    # command: '--model mistralai/Mistral-7B-v0.1 --chat-template /app/chat_template.yaml'
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://0.0.0.0:5000/v1/models" ]
       interval: 30s
