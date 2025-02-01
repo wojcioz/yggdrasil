@@ -22,10 +22,11 @@ services:
       - ./models:/models # Mount your model directory (if needed)
       - ~/.cache/huggingface:/root/.cache/huggingface
       - ./vllm_code:/code # Mount your code directory
+      - ./chat_template.yaml:/app/chat_template.yaml # Mount the chat template file
     ipc: host
     secrets:
       - huggingface_key
-    command: '--model mistralai/Mistral-7B-v0.1'
+    command: '--model mistralai/Mistral-7B-v0.1 --chat-template /app/chat_template.yaml'
 
   # LlamaIndex - For RAG handling
   llamaindex:
@@ -48,12 +49,14 @@ services:
       - "3000:8080"
     volumes:
       - open-webui:/app/backend/data
+      - ./chat_template.yaml:/app/chat_template.yaml # Mount the chat template file
     environment:
       - API_URL=http://vllm:8000/v1
       - 'OPENAI_API_BASE_URL=http://vllm:8000/v1'
       # - ENABLE_OLLAMA_API=false
       - ENABLE_RAG_WEB_SEARCH=true
       - RAG_WEB_SEARCH_ENGINE=duckduckgo
+      - CHAT_TEMPLATE=/app/chat_template.yaml # Set the chat template path
 
   # LangGraph - AI Workflow Orchestrator
   langgraph:
