@@ -18,7 +18,7 @@ services:
     environment:
       # - MODEL_NAME=TheBloke/TinyLlama-1.1B-Chat-v1.0-GGUF # Smallest model (1.1B)
       # - TENSOR_PARALLEL_SIZE=1
-      - HUGGING_FACE_HUB_TOKEN=/run/secrets/huggingface_key
+      # - HUGGING_FACE_HUB_TOKEN=/run/secrets/huggingface_key
     volumes:
       - ./models:/models # Mount your model directory (if needed)
       - ~/.cache/huggingface:/root/.cache/huggingface
