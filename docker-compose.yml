@@ -15,7 +15,7 @@ services:
             - capabilities: [ gpu ]
     ports:
       - "8000:8000"
-    environment:
+    # environment:
       # - MODEL_NAME=TheBloke/TinyLlama-1.1B-Chat-v1.0-GGUF # Smallest model (1.1B)
       # - TENSOR_PARALLEL_SIZE=1
       # - HUGGING_FACE_HUB_TOKEN=/run/secrets/huggingface_key
@@ -42,15 +42,16 @@ services:
       - openai_api_key
 
   # Open WebUI - Chat interface
-  # open-webui:
-  #   image: ghcr.io/open-webui/open-webui:main
-  #   container_name: open-webui
-  #   ports:
-  #     - "3000:8080"
-  #   volumes:
-  #     - open-webui:/app/backend/data
-  #   environment:
-  #     - API_URL=http://localhost:8000/v1
+  open-webui:
+    image: ghcr.io/open-webui/open-webui
+    
+    container_name: open-webui
+    ports:
+      - "3000:8080"
+    volumes:
+      - open-webui:/app/backend/data
+    environment:
+      - API_URL=http://localhost:8000/v1
 
   # LangGraph - AI Workflow Orchestrator
   langgraph:
