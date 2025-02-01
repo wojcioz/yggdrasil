@@ -15,10 +15,9 @@ services:
             - capabilities: [ gpu ]
     ports:
       - "8000:8000"
-    # environment:
-      # - MODEL_NAME=TheBloke/TinyLlama-1.1B-Chat-v1.0-GGUF # Smallest model (1.1B)
-      # - TENSOR_PARALLEL_SIZE=1
-      # - HUGGING_FACE_HUB_TOKEN=/run/secrets/huggingface_key
+    environment:
+      - MODEL_NAME=TheBloke/TinyLlama-1.1B-Chat-v1.0-GGUF # Smallest model (1.1B)
+      - TENSOR_PARALLEL_SIZE=1
     volumes:
       - ./models:/models # Mount your model directory (if needed)
       - ~/.cache/huggingface:/root/.cache/huggingface
@@ -43,15 +42,14 @@ services:
 
   # Open WebUI - Chat interface
   open-webui:
-    image: ghcr.io/open-webui/open-webui
-    
+    image: openwebui/open-webui:latest
     container_name: open-webui
     ports:
       - "3000:8080"
     volumes:
       - open-webui:/app/backend/data
     environment:
-      - API_URL=http://localhost:8000/v1
+      - API_URL=http://vllm:8000/v1
 
   # LangGraph - AI Workflow Orchestrator
   langgraph:
@@ -65,22 +63,30 @@ services:
       - "5000:5000" # Expose LangGraph API
     environment:
       - OPENAI_API_KEY=$(cat /run/secrets/openai_api_key) # If using OpenAI embeddings
-      - VLLM_API=http://localhost:8000/v1 # Connect to vLLM
-      - LLAMAINDEX_API=http://localhost:5001 # Connect to LlamaIndex
+      - VLLM_API=http://vllm:8000/v1 # Connect to vLLM
+      - LLAMAINDEX_API=http://llamaindex:5001 # Connect to LlamaIndex
 
   # FlowiseAI - No-code RAG workflow manager
   flowise:
     image: flowiseai/flowise:latest
     container_name: flowise
     ports:
-      - "3003:3000"
+      - "3001:3000"
     environment:
       - DATABASE_URL=sqlite:///flowise.db
     volumes:
       - ./flowise_data:/app/data
 
 secrets:
-  openai_api_key:
-    file: ./open_ai_key.txt
   huggingface_key:
     file: ./hf_key.txt
+  openai_api_key:
+    file: ./open_ai_key.txt
+
+volumes:
+  open-webui:
+
+
+networks:
+  default:
+    name: llm-rag-network
