@@ -18,3 +18,4 @@ __pycache__
 # Ignore local data folders
 models
 flowise_data
+Mistral-7B-Instruct-v0.3-quantized.w8a16
