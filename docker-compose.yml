@@ -2,23 +2,24 @@ version: '3.8'
 
 services:
 
-  model_quantizer:
-    build:
-      context: ./model_quantizer
-      dockerfile: Dockerfile
-    container_name: model_quantizer
-    runtime: nvidia
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - capabilities: [ gpu ]
-    volumes:
-      - ./models:/models # Mount your model directory
-      - ~/.cache/huggingface:/root/.cache/huggingface
-    secrets:
-      - huggingface_key
-    command: python3 quantize_model.py
+  # model_quantizer:
+  #   build:
+  #     context: ./model_quantizer
+  #     dockerfile: Dockerfile
+  #   container_name: model_quantizer
+  #   runtime: nvidia
+  #   deploy:
+  #     resources:
+  #       reservations:
+  #         devices:
+  #           - capabilities: [ gpu ]
+  #   volumes:
+  #     - ./models:/models # Mount your model directory
+  #     - ~/.cache/huggingface:/root/.cache/huggingface
+  #   secrets:
+  #     - huggingface_key
+  #   command: python3 quantize_model.py
+
   # vLLM - LLM inference service with the smallest model
   vllm:
     build:
@@ -43,7 +44,8 @@ services:
     ipc: host
     secrets:
       - huggingface_key
-    # command: '--model mistralai/Mistral-7B-v0.1 --chat-template /app/chat_template.yaml'
+    command: '--model /models/Mistral-7B-Instruct-v0.3-quantized.w8a16 --chat-template /app/chat_template.yaml --gpu_memory_utilization 0.95 --max_model_len 3000'
+
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://0.0.0.0:5000/v1/models" ]
       interval: 30s
