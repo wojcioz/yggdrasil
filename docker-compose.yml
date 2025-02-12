@@ -45,7 +45,7 @@ services:
     command: '--model /models/Mistral-7B-Instruct-v0.3-quantized.w8a16 --chat-template /app/chat_template.yaml --gpu_memory_utilization 0.95 --max_model_len 3000'
 
     healthcheck:
-      test: [ "CMD", "curl", "-f", "http://0.0.0.0:5000/v1/models" ]
+      test: [ "CMD", "curl", "-f", "http://0.0.0.0:8000/v1/models" ]
       interval: 30s
       timeout: 5s
       retries: 20
@@ -80,17 +80,26 @@ services:
     ports:
       - 8800:8000
     image: ghcr.io/chroma-core/chroma:latest
+    env_file:
+      - ./.env
+    volumes:
+      - ./chromadb/my_db:/chroma/my_db
+      - ./chromadb/my_config:/chroma/my_config
     # # LlamaIndex - For RAG handling
   llamaindex:
-    image: python:3.9-slim
+    build:
+      context: ./llamaindex
+      dockerfile: Dockerfile
     container_name: llamaindex
     command: >
-      bash -c "pip install llama-index llama-index-vector-stores-chroma llama-index-embeddings-huggingface openai && export OPENAI_API_KEY=$(cat /run/secrets/openai_api_key) && python3 /app/starter_local.py"
+      bash -c "export OPENAI_API_KEY=$(cat /run/secrets/openai_api_key) && python3 /app/starter_local.py"
+
+    # bash -c "pip install -r requirements.txt && export OPENAI_API_KEY=$(cat /run/secrets/openai_api_key) && python3 /app/starter_local.py"
 
     # bash -c "pip install llama-index llama-index-vector-stores-chroma openai && export OPENAI_API_KEY=$(cat /run/secrets/openai_api_key) && python3 -m llama_index.run"
 
     volumes:
-      - ./docs:/app/docs
+      - ./pdfs:/app/docs
       - ./llamaindex:/app
     ports:
       - "5001:5000"
@@ -99,20 +108,19 @@ services:
       # secrets:
       # - openai_api_key
       # LangGraph - AI Workflow Orchestrator
-      # langgraph:
-      #   image: python:3.9-slim
-      #   container_name: langgraph
-      #   command: >
-      #     bash -c "pip install langgraph langchain openai requests && python3 /app/langgraph_server.py"
-      #   volumes:
-      #     - ./langgraph:/app # Mount local directory for code
-      #   ports:
-      #     - "5000:5000" # Expose LangGraph API
-      #   environment:
-      #     - OPENAI_API_KEY=$(cat /run/secrets/openai_api_key) # If using OpenAI embeddings
-      #     - VLLM_API=http://vllm:8000/v1 # Connect to vLLM
-      #     - LLAMAINDEX_API=http://llamaindex:5001 # Connect to LlamaIndex
-
+    langgraph:
+      image: python:3.9-slim
+      container_name: langgraph
+      command: >
+        bash -c "pip install langgraph langchain openai requests && python3 /app/langgraph_server.py"
+      volumes:
+        - ./langgraph:/app # Mount local directory for code
+      ports:
+        - "5000:5000" # Expose LangGraph API
+      environment:
+        - OPENAI_API_KEY=$(cat /run/secrets/openai_api_key) # If using OpenAI embeddings
+        - VLLM_API=http://vllm:8000/v1 # Connect to vLLM
+        - LLAMAINDEX_API=http://llamaindex:5001 # Connect to LlamaIndex
       # # FlowiseAI - No-code RAG workflow manager
       # flowise:
       #   image: flowiseai/flowise:latest
@@ -123,7 +131,14 @@ services:
       #     - DATABASE_URL=sqlite:///flowise.db
       #   volumes:
       #     - ./flowise_data:/app/data
-
+  jupyter:
+    build:
+      context: ./jupyter_container
+      dockerfile: Dockerfile
+    ports:
+      - "8888:8888"
+    volumes:
+      - ./jupyter_container/app:/app
 secrets:
   huggingface_key:
     file: ./hf_key.txt

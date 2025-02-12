@@ -1,7 +1,7 @@
 # Ignore Git and VSCode files
 .git
 .vscode
-
+chromadb/my_db
 # Ignore environment files
 *.env
 *.venv

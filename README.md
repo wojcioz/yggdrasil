@@ -4,6 +4,12 @@ first pull the container before running docker compose up
 
 docker pull ghcr.io/open-webui/open-webui:main
 
+# download a model
+git lfs install
+
+git clone https://huggingface.co/neuralmagic/Mistral-7B-Instruct-v0.3-quantized.w8a16
+
+
 ## Work Breakdown Structure (WBS)
 
 1️⃣ **LLM Inference & Adapter Setup (vLLM)**
@@ -12,7 +18,7 @@ docker pull ghcr.io/open-webui/open-webui:main
 - [X] Expose an OpenAI-compatible API for interaction
 
 2️⃣ **RAG & Retrieval Pipeline (LangGraph + LlamaIndex + ChromaDB)**
-- [ ] Set up ChromaDB for document storage
+- [x] Set up ChromaDB for document storage
 - [ ] Configure LlamaIndex to index and retrieve documents
 - [ ] Use LangGraph to dynamically decide when to retrieve documents vs. when to generate purely from the model
 - [ ] Optimize retrieval strategies (hybrid search, reranking, etc.)
