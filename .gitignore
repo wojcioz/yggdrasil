@@ -3,7 +3,6 @@
 .vscode
 chromadb/my_db
 # Ignore environment files
-*.env
 *.venv
 
 # Ignore secrets
